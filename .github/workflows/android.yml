@@ -2,29 +2,44 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ "main", "master" ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
 
-      - name: Install Qt and Android SDK
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java Development Kit (JDK)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Qt
         uses: jurplel/install-qt-action@v3
         with:
+          version: '6.5.2'
           target: 'android'
           arch: 'android_arm64_v8a'
 
-      - name: Build APK
-        run: |
-          mkdir build && cd build
-          qt-cmake .. -DQT_HOST_PATH=$QT_ROOT_DIR
-          make -j$(nproc)
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v3
+      - name: Set up Android NDK & SDK
+        uses: nsetup/setup-android-ndk@v1
         with:
-          name: Radharani-APK
-          path: '**/*.apk'
-          
+          ndk-version: r25c
+
+      - name: Build Qt Android APK
+        run: |
+          mkdir build
+          cd build
+          qt-cmake .. -GNinja -DCMAKE_BUILD_TYPE=Release
+          ninja
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Radharani-App-APK
+          path: build/android-build/build/outputs/apk/release/*.apk
