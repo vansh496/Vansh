@@ -19,17 +19,17 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Set up Android NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25c
+
       - name: Install Qt
         uses: jurplel/install-qt-action@v3
         with:
           version: '6.5.2'
           target: 'android'
           arch: 'android_arm64_v8a'
-
-      - name: Set up Android NDK & SDK
-        uses: nsetup/setup-android-ndk@v1
-        with:
-          ndk-version: r25c
 
       - name: Build Qt Android APK
         run: |
