@@ -1,0 +1,30 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Qt and Android SDK
+        uses: jurplel/install-qt-action@v3
+        with:
+          target: 'android'
+          arch: 'android_arm64_v8a'
+
+      - name: Build APK
+        run: |
+          mkdir build && cd build
+          qt-cmake .. -DQT_HOST_PATH=$QT_ROOT_DIR
+          make -j$(nproc)
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: Radharani-APK
+          path: '**/*.apk'
+          
