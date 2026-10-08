@@ -24,18 +24,26 @@ jobs:
         with:
           ndk-version: r25c
 
-      - name: Install Qt
+      - name: Install Host Qt (Desktop Linux)
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: '6.5.2'
+          target: 'desktop'
+          setup-python: 'false'
+
+      - name: Install Target Qt (Android ARM64)
         uses: jurplel/install-qt-action@v3
         with:
           version: '6.5.2'
           target: 'android'
           arch: 'android_arm64_v8a'
+          setup-python: 'false'
 
       - name: Build Qt Android APK
         run: |
           mkdir build
           cd build
-          qt-cmake .. -GNinja -DCMAKE_BUILD_TYPE=Release
+          qt-cmake .. -GNinja -DCMAKE_BUILD_TYPE=Release -DQT_HOST_PATH=$Qt6_DIR
           ninja
 
       - name: Upload APK Artifact
